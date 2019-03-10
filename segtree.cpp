@@ -9,8 +9,10 @@ typedef struct SegTree {
 
     ll *tree;
     ll INF;
+    ll size;
 
     void init(ll n, ll value) {
+        size = n;
         tree = (ll *)malloc((n*4 + 1000) * sizeof(ll));
         for (int i = 1; i <= 4*n; i++) tree[i] = value;
         INF = value;
@@ -19,7 +21,7 @@ typedef struct SegTree {
     // [left, right]: updating range
     // [start, end]: node range
 
-    void update(ll node, ll val, ll left, ll right, ll start, ll end) {
+    void _update(ll node, ll val, ll left, ll right, ll start, ll end) {
         // no overlap
         if  (right < start || end < left) return;
         
@@ -30,23 +32,32 @@ typedef struct SegTree {
         }
 
         // partial overlap
-        update(node * 2, val, left, right, start, (start + end) / 2);
-        update(node * 2 + 1, val, left, right, (start + end) / 2 + 1, end);
+        _update(node * 2, val, left, right, start, (start + end) / 2);
+        _update(node * 2 + 1, val, left, right, (start + end) / 2 + 1, end);
 
         tree[node] = min(tree[node * 2], tree[node * 2 + 1]);
     }
 
 
-    ll get(ll node, ll left, ll right, ll start, ll end) {
+    ll _get(ll node, ll left, ll right, ll start, ll end) {
         // no overlap
         if (right < start || end < left) return INF;
 
         // full overlap
         if (left <= start && end <= right) return tree[node];
 
-        return min(get(node * 2, left, right, start, (start + end) / 2),
-                   get(node * 2 + 1, left, right, (start + end) / 2 + 1, end));
+        return min(_get(node * 2, left, right, start, (start + end) / 2),
+                   _get(node * 2 + 1, left, right, (start + end) / 2 + 1, end));
     }
+    
+    ll get(ll left, ll right) {
+        return _get(1, left, right, 1, size);
+    }
+    
+    void update(ll idx, ll val) {
+        _update(1, val, idx, idx, 1, size);
+    }
+    
 } SegTree;
 
 
@@ -60,12 +71,12 @@ typedef struct SegTree {
 //    for (int i = 1; i <= n; i++){
 //        int a;
 //        scanf("%d",&a);
-//        tree.update(1, a, i, i, 1, n);
+//        tree.update(i, a);
 //    }
 //    
 //    for (int i = 0; i < m; i++){
 //        int s, e;
 //        scanf("%d%d", &s, &e);
-//        printf("%d\n", tree.get(1, s, e, 1, n));
+//        printf("%d\n", tree.get(s, e));
 //    }
 //}
