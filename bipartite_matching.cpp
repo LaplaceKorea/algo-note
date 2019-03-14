@@ -7,7 +7,7 @@
 
 vector<int> e[SIZE];
 bool check[SIZE];
-int match[SIZE]'
+int match[SIZE];
 bool dfs(int node){
     if (check[node]) return false;
     check[node] = true;
